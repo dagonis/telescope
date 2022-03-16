@@ -25,7 +25,7 @@ or with the requirements.txt file I put in the repo
 ### Pilfer Mode (Download all files in $some_bucket in the region $some_region into a folder called found_files)
 `python3 telescope -r $some_region -b $some_bucket --download --download_folder found_files`
 ### Full Help
-```python3 
+```
 python3 telescope -h
 usage: telescope [-h] [--regions {nyc3,sgp1,sfo2,sfo3,ams3,fra1} [{nyc3,sgp1,sfo2,sfo3,ams3,fra1} ...] | --all_regions] [--buckets BUCKETS [BUCKETS ...] | --bucket_file
                  BUCKET_FILE] [--download] [--download_folder DOWNLOAD_FOLDER]
