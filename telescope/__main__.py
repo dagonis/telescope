@@ -1,4 +1,5 @@
 import argparse
+import os
 import re
 
 import requests
@@ -70,14 +71,14 @@ def main() -> None:
         print("\n".join(list(found_files)))
     else:
         print("No files found.")
-    # OLD WAY
-    # for bucket in args.buckets:
-    #     bucket_url = f"https://{bucket}.{args.region}.{DIGITAL_OCEAN_SPACES_URL}"
-    #     results = requests.get(bucket_url).text
-    #     for result in SPACE_REGEX.findall(results):
-    #         item = result.split(">")[1].split("<")[0]
-    #         found_files.add(f"{bucket_url}/{item}")
-    # print(found_files)
+    if args.download and len(found_files) > 0:
+        if not os.path.isdir(args.download_folder):
+            os.mkdir(args.download_folder)
+        for found_file in found_files:
+            downloaded_file = requests.get(found_file)
+            if downloaded_file.status_code == 200:
+                with open(f'{args.download_folder}/{found_file.split("/")[-1]}', 'wb') as output_file:
+                    output_file.write(downloaded_file.content)
 
 
 if __name__ == '__main__':

@@ -2,6 +2,8 @@
 Scan Digital Ocean spaces!
 
 Digital Ocean spaces are the equivalent of S3 Buckets/Azure Blobs/etc. Telescope will look in spaces (which I just call buckets) to see if there any files you may be able to download.
+
+You can download anything you find as well, be careful with this as there might be a significant amount of data. 
 ## Requirements/Installation
 Requires Python 3.7+ (confirmed broken on anything older)
 
@@ -19,6 +21,9 @@ or with the requirements.txt file I put in the repo
 
 ### POWER MODE (look for $buckets in $file_of_buckets in all regions)
 `python3 telescope -R -f $file_of_buckets`
+
+### Pilfer Mode (Download all files in $some_bucket in the region $some_region into a folder called found_files)
+`python3 telescope -r $some_region -b $some_bucket --download --download_folder found_files`
 ### Full Help
 ```python3 
 python3 telescope -h
