@@ -19,9 +19,6 @@ DIGITAL_OCEAN_REGIONS = ['nyc3',
 def main() -> None:
     """Main function of telescope
     """
-    # parser = argparse.ArgumentParser(yu)
-    # parser.add_argument('--region', "-r", type=str, choices=DIGITAL_OCEAN_REGIONS, help="The Region you want to check.")
-    # parser.add_argument('buckets', nargs="+", help="The bucket(s) you want to check")
     parser = argparse.ArgumentParser(description=BANNER)
     # Exclusive Argument Group if you want to either specify a region or if you want to try all regions with your bucket name(s)
     region_group = parser.add_mutually_exclusive_group()
@@ -42,25 +39,38 @@ def main() -> None:
     elif args.regions is not None:
         region_list = args.regions.copy()
     else:
-        parser.print_help()
         print('You must specify at least one region with -r, or all regions with -R.')
     # Now let's sort out the buckets we will look into.
-    print(args)
     bucket_set = set()
     if args.bucket_file is not None:
-        with open(args.bucket_file, 'r') as _buckets:
-            for bucket in _buckets:
-                bucket_set.add(bucket.rstrip()) 
+        with open(args.bucket_file, 'r', encoding="UTF-8") as buckets_file:
+            for _bucket in buckets_file:
+                bucket_set.add(_bucket.rstrip())
     elif args.buckets is not None:
-        for bucket in args.buckets:
-            bucket_set.add(bucket)
+        for user_suplied_bucket in args.buckets:
+            bucket_set.add(user_suplied_bucket)
     else:
-        parser.print_help()
         print('You must specify at least one bucket with -b, or a file with buckets with -f')
+    buckets_to_check = set()
     for bucket in bucket_set:
         for region in region_list:
-            bucket_url = f"https://{bucket}.{region}.{DIGITAL_OCEAN_SPACES_URL}"
-            print(bucket_url)
+            bucket_url_to_check = f"https://{bucket}.{region}.{DIGITAL_OCEAN_SPACES_URL}"
+            buckets_to_check.add(bucket_url_to_check)
+    found_files = set()
+    for bucket_to_check in buckets_to_check:
+        results = requests.get(bucket_to_check)
+        bucket_url = bucket_to_check
+        if not results.status_code == 200:
+            pass
+        else:
+            for result in SPACE_REGEX.findall(results.text):
+                item = result.split(">")[1].split("<")[0]
+                found_files.add(f"{bucket_url}/{item}")
+    if len(found_files) > 0:
+        print("Found the following files:")
+        print("\n".join(list(found_files)))
+    else:
+        print("No files found.")
     # OLD WAY
     # for bucket in args.buckets:
     #     bucket_url = f"https://{bucket}.{args.region}.{DIGITAL_OCEAN_SPACES_URL}"
